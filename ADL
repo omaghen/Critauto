@@ -1,0 +1,130 @@
+#vider la mémoire
+rm(list = ls())
+
+
+#Library
+library("DescTools")# Pour la visualisation des données manquantes
+library(dplyr)
+library(tidyverse) #Pour ggplot
+library(nnet)
+library('Hmisc') #pour describe
+library(MASS)
+library(glmnet)
+library(readr)
+
+library(MASS)
+library(class)
+library(nnet)
+
+CO2 <- read.csv2("C:/Users/b/Documents/M2 S9/SEP0953 Conférences, Gestion de projet et Projet digital, SAS et VBA/Projet digital/CO2/Projet digitale (CO2)/bdd_CO2.csv", stringsAsFactors=TRUE)
+View(CO2)
+
+# #variable réponse : var_co2
+# #variables explicatives (numériques) : typ_boite_nb_rappA 5 + typ_boite_nb_rappA 6 + conso_exurb + 
+# CarrosserieCOMBISPACE + CarrosserieMINIBUS + CarrosserieTS TERRAINS/CHEMINS + gammeLUXE
+
+#quelques statistiques
+summary(CO2)
+
+# calculating the product of dimensions of dataframe 
+totalcells = prod(dim(CO2)) #nombre total de cellule est de 143144
+
+# calculating the number of cells with na
+missingcells = sum(is.na(CO2)) #nombre de cellule na est de 58307
+
+# calculating percentage of missing values
+percentage = (missingcells * 100 )/(totalcells) #pourcentage de na est de 4.074153
+
+#Créer la variable catégorielle CO2 (nouvelle base -> CO2_mod)
+CO2 %>% 
+  mutate(var_co2 = ifelse(co2 < 175,"faible",ifelse(co2 < 225, "moyenne","forte"))) %>%
+  dplyr::select(-co2, -dscom, -hybride,-hc, -nox) -> CO2_mod
+
+colnames(CO2_mod)
+
+#On retire toutes les données manquantes !
+na.omit(CO2_mod) -> data_co2  #On retire toutes les données manquantes !
+as.factor(data_co2$var_co2) -> data_co2$var_co2
+# colnames(data_co2)
+ncol(data_co2)    # nombre de colonnes (variables)
+View(data_co2)
+
+#description de la base data_co2
+
+totalcells_mod = prod(dim(data_co2)) #nombre total de cellule est de 993322
+((totalcells -totalcells_mod )*100)/ totalcells #on a retiré 30% de la base initial
+
+totalcells = prod(dim(CO2_mod)) #nombre total de cellule est de 993322
+((totalcells -totalcells_mod )*100)/ totalcells #on a retiré 18% par sélection de lignes sans données manquantes sur la base conennant certaines colonnes
+
+#Pour éviter le sur-apprentissage!
+#on transforme les variables explicatives qualitatives en variables numériques
+#cette fonction construit la matrice de design en remplaçant chacune des variables qualitatives pour les indicatrices 
+#de ses modalités (la première modalité est supprimée)
+#on supprime la première colonne correspondant à l'intercept
+
+XX <- model.matrix(var_co2 ~ cod_cbr+puiss_admin_98+typ_boite_nb_rapp+conso_exurb+Carrosserie+gamme, data = data_co2)[,-1]
+
+#Nouvelle bdd constituée que de variables explicatives numériques et une variable réponse qualitative (multiple) 
+data_co2 <- cbind(as.data.frame(XX), var_co2 = as.factor(data_co2[,"var_co2"]))
+
+#on cherche à prédire les 3 modalités de la variable réponse ``var_co2'' en fonction
+#de cinq variables explicatives numériques
+
+#On compare les 4 classifieurs en terme de l'erreur de classification, 
+#estimée par validation croisée : train + test
+#On découpe l'échantillon en deux parties : train + test
+
+set.seed(555)
+index <- 1:nrow(data_co2)
+l <- 3        #(l-1)/l d'observations pour l'apprentissage et 1/l observations pour le test
+test.set.index <- sample(x = index, size = trunc(length(index)/l), replace = FALSE)
+co2.test.set <- data_co2[test.set.index,]
+co2.train.set <- data_co2[- test.set.index,]
+
+#### erreur du classifieur RegLogMultinom ####
+modele.RegLogM <- multinom(formula = var_co2 ~ conso_exurb + `typ_boite_nb_rappA 5` + `CarrosserieTS TERRAINS/CHEMINS` + gammeLUXE + CarrosserieCOMBISPACE, data = co2.train.set, maxit = 3000) 
+RegLogM.pred <- predict(object = modele.RegLogM, newdata = co2.test.set)
+err.classif.RegLogM <- mean(!(RegLogM.pred == co2.test.set$var_co2))
+print(err.classif.RegLogM)
+
+#### erreur du classifieur ADL : ####
+modele.ADL <- lda(formula = var_co2 ~ conso_exurb + `typ_boite_nb_rappA 5` + `CarrosserieTS TERRAINS/CHEMINS` + gammeLUXE + CarrosserieCOMBISPACE , data = co2.train.set)
+ADL.pred <- predict(object = modele.ADL, newdata = co2.test.set)
+err.classif.ADL <- mean(!(ADL.pred$class == co2.test.set$var_co2))
+print(err.classif.ADL)
+
+#Les % des séparations réalisées:
+#avec la 1ère foncrion linéaire LD1, environ 94% des séparations ont été réalisées
+#le pourcentage de séparations archivées par la 1ère fonction discriminante est de 94%
+#avec la 2ème foncrion linéaire LD2, 5% des séparations ont été réalisées
+
+#Nous cherchons la meilleur déparation des groupes sur base de niveau de CO2
+
+#Histogramme de LD1 = nous permet de voir comment les groupes sont séparés (la séparation)
+p <- predict(modele.ADL, co2.train.set)
+ldahist(data= p$x[,1], g = co2.train.set$var_co2) #p$x[,1] donne les données de LD1
+
+#Bi-plot
+library(ggplot2)
+library(devtools)
+install_github('fawda123/ggord')
+library(ggord)
+ggord(modele.ADL, co2.train.set$var_co2, ylim=c(-10,10))
+
+
+#Comparaison des 2 modèles
+err.classif.RegLogM
+err.classif.ADL
+
+sprintf("erreur_reg_log = %f ",err.classif.RegLogM)
+sprintf("erreur_ADL = %f",err.classif.ADL)
+
+#le modèle avec l'erreur la plus petite est le modèle de classification optimale
+
+
+
+
+
+
+
