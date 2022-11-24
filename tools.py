@@ -34,7 +34,7 @@ def supression_NA(nom_bdd):
     return nom_bdd.dropna()
 
 
-''' Convertir une variables qualitatives en catégorielles '''
+''' Convertir une variable qualitative en catégorielle '''
 def columns_string_to_factor(nom_colonne):
     return nom_colonne.astype('category')
 
