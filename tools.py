@@ -69,11 +69,8 @@ def XX(data, liste):
             data = pd.concat([data, dummies], axis=1)
     return data
 
-
-
-
-''' régression logistique sur le modèle optimal '''
-def rég_log(data, liste_var):
+'''Fractionnement des données d'entraînement et de test'''
+def splitting_train_test(data, liste_var):
     k = len(data.columns)
     d = data.copy()
     for i in range(0, k):
@@ -85,21 +82,17 @@ def rég_log(data, liste_var):
     # Creating the features and target
     data['var_co2'] = data['var_co2'].astype('category')
     features = data.select_dtypes(np.number)  # pour sélectionner que les variables de type numérique
-    target = data[
-        'var_co2'].cat.codes  # Return Series of codes as well as the index: [0 = faible], [1 = forte], [2 = moyenne]
+    target = data['var_co2'].cat.codes  # Return Series of codes as well as the index: [0 = faible], [1 = forte], [2 = moyenne]
     # Creating the training and testing data
-    # X_train, X_test, y_train, y_test = train_test_split(features, target, test_size = 0.33, random_state = 42, stratify = target)
-    # On créé une base de données pour créer notre modèle puis une autre pour classifier
-    random.seed(1234)
-    Train = data[1:500]  # échantillon d'apprentissage
-    Test = data[500:1268]  # échantillon de validation
+    X_train, X_test, y_train, y_test = train_test_split(features, target, test_size = 0.33, random_state = 42, stratify = target)
 
-    X_train = Train.drop(['var_co2'], axis=1)
-    y_train = Train['var_co2'].cat.codes
+    return X_train, y_train, X_test, y_test
 
-    X_test = Test.drop(['var_co2'], axis=1)
-    y_test = Test['var_co2'].cat.codes
 
+''' régression logistique sur le modèle optimal '''
+def rég_log(data, X_train, y_train, X_test, y_test):
+    data['var_co2'] = data['var_co2'].astype('category')
+    features = data.select_dtypes(np.number)  # pour sélectionner que les variables de type numérique
     # Initializing an logistic regression object
     logistic_reg = linear_model.LogisticRegression()
     # Fitting the model to the training and test sets
@@ -124,6 +117,71 @@ def rég_log(data, liste_var):
 
     return coeff_reg_log, matrice
 
+
+'''Analyse discriminante linéaire'''
+def ADL(X_train, y_train, X_test, y_test):
+    # Initializing an discriminant analysis object
+    adl = LinearDiscriminantAnalysis()
+    # Fitting the model to the training and test sets
+    adl.fit(X_train, y_train)
+    # Accuracy score of the logistic regression model
+    adl.score(X_test, y_test)  # précision du modèle #on obtient un score entre 0 et 1 (0.95 = 95%)
+
+    adl.intercept_
+    adl.coef_
+
+    # Tableau variables et leurs coefficents de la régression logistique
+    coeff_adl = pd.DataFrame(np.concatenate([adl.intercept_.reshape(-1, 1), adl.coef_], axis=1),
+                             index=["Faible", "Forte", "Moyenne"],
+                             columns=["intercept"] + list(features.columns)).T
+
+    # matrice de confusion
+    y_pred = []
+    for i in range(len(X_test)):
+        pred = int(adl.predict([np.array(X_test)[i]]))
+        y_pred.append(pred)
+
+    matrice = confusion_matrix(y_true=y_test, y_pred=y_pred)
+
+    return coeff_adl, matrice
+
+'''Random Forest '''
+def Random_forest(X_train, y_train, X_test, y_test):
+    modele_rf = RandomForestClassifier(
+        n_estimators=100,
+        criterion='gini',
+        max_depth=None,
+        min_samples_split=2,
+        min_samples_leaf=1,
+        min_weight_fraction_leaf=0.0,
+        max_features='auto',
+        max_leaf_nodes=None,
+        min_impurity_decrease=0.0,
+        bootstrap=True,
+        oob_score=False,
+        n_jobs=None,
+        random_state=None,
+        verbose=0,
+        warm_start=False,
+        class_weight=None,
+        ccp_alpha=0.0,
+        max_samples=None, )
+    # Apprentissage
+    model_rf.fit(X_train, y_train)
+
+    # l'importance des variables de notre modèle de foret aléatoire
+    classement_var = pd.DataFrame(modele_rf.feature_importances_,
+                                  index=x_train.columns,
+                                  columns=["importance"]).sort_values("importance", ascending=False)
+    # Validation du modèle et prédiction
+    # accuracy
+    print(f"Le pourcentage de bien classés est de : {accuracy_score(y_test, modele_rf.predict(x_test)) * 100} %")
+
+    # Matrice de confusion (pour avoir une analyse plus fine des résultats)
+    matrice = pd.DataFrame(confusion_matrix(y_test, modele_rf.predict(x_test)),
+                           index=["blanc_données", "rouge_données"],
+                           columns=["blanc_predit", "rouge_predit"])
+    return classement_var, matrice
 
 '''Catégorie d'émission de la voiture: Forte, faible ou moyenne'''
 def catégorie_émission_voiture(coeff_reg_log, conso_urb, conso_exurb, cod_cbrGO, lib_mrqMERCEDES, cod_cbrFE,
