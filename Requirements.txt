@@ -1,8 +1,15 @@
 #Librairies utilisées dans le projet
 -> pandas
+-> random
 -> Counter from collections
 -> LabelEncoder from sklearn.prepocessing
 -> OnHotEncoder from sklearn.processing
 -> linear_model from sklearn
 -> LogisticRegression from sklearn
 -> train_test_split from sklearn.model_selection
+-> confusion_matrix from sklearn.metrics
+-> RandomForestClassifier from sklearn.ensemble
+-> LinearDiscriminantAnalysis from sklearn.discriminant_analysis
+-> StandardScaler from sklearn.preprocessing
+-> LassoCV from sklearn.linear_model
+-> MultiTaskLassoCV from sklearn.linear_model
