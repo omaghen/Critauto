@@ -25,9 +25,14 @@ Les données complétées par l’ADEME sont les suivantes :
 •	Les résultats d’expertises tels le coût annuel de la consommation de carburant sur 15 000 km
 
 Contributeurs : UTAC, ADEME
+
 Date de création : 7 juillet 2014
+
 Couverture géographique : France
+
 Langue : Français
+
 Source: Emissions de CO2 et de polluants des véhicules commercialisés en France    https://www.data.gouv.fr/fr/datasets/r/da84abee-6038-43ea-b316-cdaea2514f66 
+
 
 Une description des variables du jeu de données est disponible dans le dossier "Ressources" 
