@@ -70,6 +70,8 @@ def XX(data, liste):
     return data
 
 
+
+
 ''' régression logistique sur le modèle optimal '''
 def rég_log(data, liste_var):
     k = len(data.columns)
