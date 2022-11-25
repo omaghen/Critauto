@@ -1,4 +1,5 @@
 //Structure du projet
+
 L'objectif de ce projet est de mettre en place une application permattant d'identifier les voitures les plus polluantes. En s'appuyant sur un jeu de données d'environ 50000 véhicules, elle nous aidera à prédire le niveau d'émission de CO2 d'un véhicule en utilisant sa marque, son modèle, sa carosseraie, taille, type de boite de vitesse ...
 
 Contexte:
