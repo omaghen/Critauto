@@ -94,6 +94,13 @@ if __name__ == '__main__':
 
     '''Exemple classification d'un vehicule selon le Random Forest'''
 
+    puiss_admin_98 = 100
+    conso_urb = 15
+    conso_exurb = 7
+    cod_cbrFE = 1
+    cod_cbrGO = 0  # Attention si 1 GO alors 0 FE
+    carrosserieTS_TERRAINS_CHEMINS = 1
+
     statut_pollution_voiture_random_forest = catégorie_émission_voiture_random_forest(X_train, y_train, X_test, y_test,
                                                                                       puiss_admin_98, conso_urb,
                                                                                       conso_exurb,
@@ -103,12 +110,6 @@ if __name__ == '__main__':
 
 
     '''Exemple classification d'un vehicule selon la régression logistique'''
-    puiss_admin_98 = 100
-    conso_urb = 15
-    conso_exurb = 7
-    cod_cbrFE = 1
-    cod_cbrGO = 0  # Attention si 1 GO alors 0 FE
-    carrosserieTS_TERRAINS_CHEMINS = 1
 
     statut_pollution_voiture_reg_log = catégorie_émission_voiture_rég_log(coeff_reg_log, puiss_admin_98, conso_urb, conso_exurb,
                                                                   cod_cbrFE, cod_cbrGO, carrosserieTS_TERRAINS_CHEMINS)
