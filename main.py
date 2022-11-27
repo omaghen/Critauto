@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     print('Le modèle qui classifie le mieux les véhicules est ', modele_optimal )
 
-    '''Exemple classification d'un vehicule selon la régression logistique'''
+    '''Exemple classification d'un vehicule selon le Random Forest'''
 
     statut_pollution_voiture_random_forest = catégorie_émission_voiture_random_forest(X_train, y_train, X_test, y_test,
                                                                                       puiss_admin_98, conso_urb,
@@ -100,7 +100,7 @@ if __name__ == '__main__':
                                                                                       cod_cbrFE, cod_cbrGO,
                                                                                       carrosserieTS_TERRAINS_CHEMINS)
     print("Selon le Random Forest, ce véhicule a une", statut_pollution_voiture_random_forest, "de CO2")
-    
+
 
     '''Exemple classification d'un vehicule selon la régression logistique'''
     puiss_admin_98 = 100
