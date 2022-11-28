@@ -1,0 +1,14 @@
+import_bdd_csv -> Importation du jeu de donnees de type csv
+import_bdd_excel -> Importation du jeu de donnees de type excel
+total_cellules -> Nombre total de cellules
+num_NA -> nombre total de valeurs manquantes
+perc_NA -> Pourcentage des valeurs manquantes
+supression_NA -> Supression des valeurs manquantes
+XX -> Remplacement chacune des variables qualitatives par les indicatrices de ses modalités
+reg_LASSO -> Régression Lasso pour la sélection des variables
+splitting_train_test -> Fractionnement des données d'entraînement et de test
+rég_log -> régression logistique
+ADL -> Analyse discriminante linéaire
+Random_forest -> Algorithme d'aprrentissage Random forest
+catégorie_émission_voiture_rég_log -> Classification des voitures selon le modèle de régression logistique
+catégorie_émission_voiture_random_forest -> Classification des voitures selon le modèle de Random Forest

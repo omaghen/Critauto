@@ -117,7 +117,7 @@ def splitting_train_test(data, liste_var):
     return X_train, y_train, X_test, y_test
 
 
-''' régression logistique sur le modèle optimal '''
+''' régression logistique  '''
 def rég_log(data, X_train, y_train, X_test, y_test):
     features = X_train.select_dtypes(np.number)
     # Initializing an logistic regression object
