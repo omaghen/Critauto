@@ -1,3 +1,5 @@
+//Utilités des fonctions
+
 import_bdd_csv -> Importation du jeu de donnees de type csv
 import_bdd_excel -> Importation du jeu de donnees de type excel
 total_cellules -> Nombre total de cellules
