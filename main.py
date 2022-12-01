@@ -3,6 +3,10 @@ import statistics
 
 if __name__ == '__main__':
 
+    '''Tests unitaires'''
+    '''import pytest
+       !pytest test_tools.py        ->    ces 2 lignes de codes sont à exécuter directement dans la console'''
+
     path = 'C:/Users/b/Documents/Projet CO2'  # chemin où se trouve le jeu de données
 
     # Importation du jeu de données (nettoyé)
@@ -13,10 +17,10 @@ if __name__ == '__main__':
     data = XX(data)
 
     # Demander la saisie des variables optimales sélectionnées par les algorithmes de sélection de modèles
-    print('Veuillez saisir la liste des variables optimales sélectionnées par les algorithmes de sélection de modèles ')
-    liste_var_opt = input()
+    #print('Veuillez saisir la liste des variables optimales sélectionnées par les algorithmes de sélection de modèles ')
+    #liste_var_opt = input()
 
-    #liste_var_opt = ['conso_urb', 'conso_exurb', 'FE', 'puiss_admin_98', 'TS TERRAINS/CHEMINS', 'GO']
+    liste_var_opt = ['conso_urb', 'conso_exurb', 'FE', 'puiss_admin_98', 'TS TERRAINS/CHEMINS', 'GO']
 
     #Création des données d'apprentissage et de test
     X_train = splitting_train_test(data, liste_var_opt)[0]
@@ -34,7 +38,7 @@ if __name__ == '__main__':
 
     '''2nd model : ADL'''
     # Les coefficients de la régression logistique
-    coeff_adl = rég_log(data, X_train, y_train, X_test, y_test)[0]
+    coeff_adl = ADL(X_train, y_train, X_test, y_test)[0]
 
     # La matrice de confusion de l'ADL ( = 0.05917576611482922)
     matrice_conf_ADL = ADL(X_train, y_train, X_test, y_test)[1]
@@ -45,7 +49,6 @@ if __name__ == '__main__':
     # La matrice de confusion de Random Forest
     matrice_conf_random_forest = Random_forest(X_train, y_train, X_test, y_test)[1]
     print("La matrice de confusion de Random Forest: \n", matrice_conf_random_forest)
-
 
 
     '''Comparaison des modèles: Erreurs de classification'''
@@ -72,13 +75,13 @@ if __name__ == '__main__':
         # Erreur de classification de Random Forest
         Erreur_random_forest[i] = Random_forest(X_train, y_train, X_test, y_test)[2]
 
-    Erreur_classif_reg_log = statistics.mean([Erreur_reg_log])
+    Erreur_classif_reg_log = statistics.mean(Erreur_reg_log)
     print("L'erreur de classification de la régression logistique est ", Erreur_classif_reg_log)
 
-    Erreur_classif_ADL = statistics.mean([Erreur_ADL])
+    Erreur_classif_ADL = statistics.mean(Erreur_ADL)
     print("L'erreur de classification de l'ADL est ", Erreur_classif_ADL)
 
-    Erreur_classif_random_forest = statistics.mean([Erreur_random_forest])
+    Erreur_classif_random_forest = statistics.mean(Erreur_random_forest)
     print("L'erreur de classification de Random Forest est ", Erreur_classif_random_forest)
 
     Erreur_minim = min(Erreur_classif_reg_log, Erreur_classif_ADL, Erreur_classif_random_forest)

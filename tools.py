@@ -1,5 +1,6 @@
 from pylab import*
 import pandas as pd
+import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn import linear_model
 from sklearn.linear_model import LogisticRegression
@@ -142,7 +143,9 @@ def rég_log(data, X_train, y_train, X_test, y_test):
     for i in range(len(X_test)):
         pred = int(logistic_reg.predict([np.array(X_test)[i]]))
         y_pred.append(pred)
-    matrice = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    matrice = pd.DataFrame(confusion_matrix(y_true=y_test, y_pred=y_pred),
+                 index=["Faible_donnees", "Forte_donnees", "Moyenne_donnees"],
+                 columns=["Faible_predit", "Forte_predit", "Moyenne_predit"])
 
     return coeff_reg_log, matrice, Erreur_classif
 
@@ -174,7 +177,10 @@ def ADL(X_train, y_train, X_test, y_test):
         pred = int(adl.predict([np.array(X_test)[i]]))
         y_pred.append(pred)
 
-    matrice = confusion_matrix(y_true=y_test, y_pred=y_pred)
+    matrice = pd.DataFrame(confusion_matrix(y_true=y_test, y_pred=y_pred),
+                 index=["Faible_donnees", "Forte_donnees", "Moyenne_donnees"],
+                 columns=["Faible_predit", "Forte_predit", "Moyenne_predit"])
+
 
     return coeff_adl, matrice, Erreur_classif
 
@@ -216,7 +222,7 @@ def Random_forest(X_train, y_train, X_test, y_test):
                            index=["Faible_donnees", "Forte_donnees", "Moyenne_donnees"],
                            columns=["Faible_predit", "Forte_predit", "Moyenne_predit"])
 
-    return classement_var, matrice, Erreur_classif
+    return classement_var, matrice, Erreur_classif, modele_rf
 
 
 '''Classification des voitures selon le modèle de régression logistique'''
@@ -241,7 +247,7 @@ def catégorie_émission_voiture_rég_log(coeff_reg_log, puiss_admin_98, conso_u
     elif maxi == Pforte:
         catégorie = "Forte émission"
     else:
-        catégorie = "moyenne émission"
+        catégorie = "Moyenne émission"
 
     return catégorie
 
@@ -249,7 +255,7 @@ def catégorie_émission_voiture_rég_log(coeff_reg_log, puiss_admin_98, conso_u
 def catégorie_émission_voiture_random_forest(X_train, y_train, X_test, y_test, puiss_admin_98, conso_urb, conso_exurb,
                                              cod_cbrFE, cod_cbrGO, carrosserieTS_TERRAINS_CHEMINS):
     X_new_car = [puiss_admin_98, conso_urb, conso_exurb, cod_cbrFE, cod_cbrGO, carrosserieTS_TERRAINS_CHEMINS]
-    modele_rf = Random_forest(X_train, y_train, X_test, y_test)[0]
+    modele_rf = Random_forest(X_train, y_train, X_test, y_test)[3]
     m = int(modele_rf.predict([X_new_car]))
 
     if m == 0:
